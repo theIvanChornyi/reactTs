@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { FC, lazy, Suspense, useState, useCallback, memo } from 'react';
+import AddTodo from './components/AddTodo/AddTodo';
+import { ITodos } from './types/todo';
+const TodoList = lazy(() => import('./components/TodoList/TodoList'));
 
-function App() {
+const App: FC = memo(() => {
+  const [todos, setTodo] = useState<ITodos[]>([]);
+
+  const handleAddTodo = useCallback((todo: ITodos) => {
+    setTodo(p => [...p, todo]);
+  }, []);
+  const handleDeleteTodo = useCallback((id: ITodos['id']) => {
+    setTodo(p => p.filter(todo => todo.id !== id));
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div>
+        <h1>TODOS</h1>
+        <AddTodo handleAddTodo={handleAddTodo} />
+        <TodoList todos={todos} handleDeleteTodo={handleDeleteTodo} />
+      </div>
+    </Suspense>
   );
-}
+});
 
 export default App;
